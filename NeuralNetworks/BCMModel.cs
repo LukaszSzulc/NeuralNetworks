@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace NeuralNetworks
+﻿namespace NeuralNetworks
 {
+    using NeuralNetworks.Common;
+
     public class BcmModel
     {
         private readonly int matrixSize;
@@ -20,8 +16,8 @@ namespace NeuralNetworks
 
         public void Train(int[] vector)
         {
-            
-            var temporaryArray = CreateTemporaryArray();
+
+            var temporaryArray = NeuralNetworksHelpers.CreateTemporaryMatrix(matrixSize, matrixSize);
             for (int i = 0; i < vector.Length; i++)
             {
                 for (var j = 0; j < vector.Length; j++)
@@ -33,12 +29,12 @@ namespace NeuralNetworks
                 }
             }
 
-            AddTemporaryArrayToCorrectionalMatrix(temporaryArray);
+            CorrelationMatrix = NeuralNetworksHelpers.AddMatrixesWithBinaryCutout(temporaryArray, CorrelationMatrix);
         }
 
         public bool Test(int[] vector)
         {
-            var resultVector = MultiplyVectorWithMatrix(vector);
+            var resultVector = NeuralNetworksHelpers.MultiplyVectorWithMatrix(vector,CorrelationMatrix,matrixSize,matrixSize);
             NormalizeWithThreshold(resultVector);
             return VerifyVectors(vector, resultVector);
         }
@@ -72,57 +68,6 @@ namespace NeuralNetworks
             {
                 CorrelationMatrix[i] = new int[matrixSize];
             }
-        }
-
-        private int[][] CreateTemporaryArray()
-        {
-            var temporaryArray = new int[CorrelationMatrix.Length][];
-            for (var i = 0; i < temporaryArray.Length; i++)
-            {
-                temporaryArray[i] = new int[temporaryArray.Length];
-            }
-
-            return temporaryArray;
-        }
-
-        private void AddTemporaryArrayToCorrectionalMatrix(IReadOnlyList<int[]> temporaryArray)
-        {
-            for (var i = 0; i < temporaryArray.Count; i++)
-            {
-                for (var j = 0; j < temporaryArray.Count; j++)
-                {
-                    CorrelationMatrix[i][j] += temporaryArray[i][j];
-                    if (CorrelationMatrix[i][j] > 1)
-                    {
-                        CorrelationMatrix[i][j] = 1;
-                    }
-                }
-            }
-        }
-
-
-        private int[] MultiplyVectorWithMatrix(int[] vector)
-        {
-            var result = new int[1][];
-            result[0] = new int[vector.Length];
-            var matrix = new int[1][];
-            matrix[0] = vector;
-            for (int i = 0; i < matrix.GetLength(0); i++)
-            {
-                
-                for (int j = 0; j < matrixSize; j++)
-                {
-                    int temp = 0;
-                    for (int k = 0; k < matrixSize; k++)
-                    {
-                        temp += matrix[i][k] * CorrelationMatrix[k][j];
-                    }
-
-                    result[i][j] = temp;
-                }
-            }
-
-            return result[0];
         }
     }
 }
