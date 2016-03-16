@@ -1,6 +1,7 @@
 ﻿namespace NeuralNetworks.Tests
 {
-	using System.Data;
+    using System;
+    using System.Data;
 
 	using Xunit;
 
@@ -61,5 +62,5 @@
 
 			Assert.False(resultOfTest);
 		}
-	}
+    }
 }
