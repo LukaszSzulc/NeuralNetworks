@@ -15,7 +15,7 @@ namespace NeuralNetworks
         public BcmModel(int matrixSize)
         {
             this.matrixSize = matrixSize;
-            InitializeMatrix(matrixSize);
+            InitializeMatrix();
         }
 
         public void Train(int[] vector)
@@ -60,11 +60,12 @@ namespace NeuralNetworks
         {
             for (var i = 0; i < vector.Length; i++)
             {
+
                 vector[i] /= Threshold;
             }
         }
 
-        private void InitializeMatrix(int matrixSize)
+        private void InitializeMatrix()
         {
             CorrelationMatrix = new int[matrixSize][];
             for (var i = 0; i < matrixSize; i++)
