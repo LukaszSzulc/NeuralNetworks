@@ -8,14 +8,19 @@ namespace NeuralNetworks
 {
     public class BcmModel
     {
+        private readonly int matrixSize;
+
+        const int Threshold = 2;
         public int[][] CorrelationMatrix { get; private set; }
         public BcmModel(int matrixSize)
         {
+            this.matrixSize = matrixSize;
             InitializeMatrix(matrixSize);
         }
 
         public void Train(int[] vector)
         {
+            
             var temporaryArray = CreateTemporaryArray();
             for (int i = 0; i < vector.Length; i++)
             {
@@ -31,9 +36,32 @@ namespace NeuralNetworks
             AddTemporaryArrayToCorrectionalMatrix(temporaryArray);
         }
 
-        public void Test(int[] vector)
+        public bool Test(int[] vector)
         {
-            
+            var resultVector = MultiplyVectorWithMatrix(vector);
+            NormalizeWithThreshold(resultVector);
+            return VerifyVectors(vector, resultVector);
+        }
+
+        private bool VerifyVectors(int[] vector, int[] resultVector)
+        {
+            for (var i = 0; i < vector.Length; i++)
+            {
+                if (vector[i] != resultVector[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void NormalizeWithThreshold(int[] vector)
+        {
+            for (var i = 0; i < vector.Length; i++)
+            {
+                vector[i] /= Threshold;
+            }
         }
 
         private void InitializeMatrix(int matrixSize)
@@ -74,7 +102,26 @@ namespace NeuralNetworks
 
         private int[] MultiplyVectorWithMatrix(int[] vector)
         {
-            return new int[10];
+            var result = new int[1][];
+            result[0] = new int[vector.Length];
+            var matrix = new int[1][];
+            matrix[0] = vector;
+            for (int i = 0; i < matrix.GetLength(0); i++)
+            {
+                
+                for (int j = 0; j < matrixSize; j++)
+                {
+                    int temp = 0;
+                    for (int k = 0; k < matrixSize; k++)
+                    {
+                        temp += matrix[i][k] * CorrelationMatrix[k][j];
+                    }
+
+                    result[i][j] = temp;
+                }
+            }
+
+            return result[0];
         }
     }
 }
