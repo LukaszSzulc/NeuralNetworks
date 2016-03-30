@@ -1,73 +1,41 @@
 ﻿namespace NeuralNetworks
 {
+    using MathNet.Numerics.LinearAlgebra;
+
     using NeuralNetworks.Common;
 
     public class BcmModel
     {
-        private readonly int matrixSize;
 
         const int Threshold = 2;
-        public int[][] CorrelationMatrix { get; private set; }
-        public BcmModel(int matrixSize)
+
+        private readonly Matrix<float> _correlationMatrix;
+
+        public Matrix<float> CorrelationMatrix => _correlationMatrix;
+         
+        public BcmModel(int size)
         {
-            this.matrixSize = matrixSize;
-            InitializeMatrix();
+            _correlationMatrix = Matrix<float>.Build.DenseOfArray(new float[size,size]);
         }
 
-        public void Train(int[] vector)
+        public void Train(Vector<float> vector)
         {
-
-            var temporaryArray = NeuralNetworksHelpers.CreateTemporaryMatrix(matrixSize, matrixSize);
-            for (int i = 0; i < vector.Length; i++)
+            for (int i = 0; i < vector.Count; i++)
             {
-                for (var j = 0; j < vector.Length; j++)
+                for (var j = 0; j < vector.Count; j++)
                 {
-                    if (vector[i] * vector[j] == 1)
+                    if ((int)vector[i] * (int)vector[j] == 1)
                     {
-                        temporaryArray[i][j]++;
+                        _correlationMatrix[i,j] = 1;
                     }
                 }
             }
-
-            CorrelationMatrix = NeuralNetworksHelpers.AddMatrixesWithBinaryCutout(temporaryArray, CorrelationMatrix);
         }
 
-        public bool Test(int[] vector)
+        public bool Test(Vector<float> vector)
         {
-            var resultVector = NeuralNetworksHelpers.MultiplyVectorWithMatrix(vector,CorrelationMatrix,matrixSize,matrixSize);
-            NormalizeWithThreshold(resultVector);
-            return VerifyVectors(vector, resultVector);
-        }
-
-        private bool VerifyVectors(int[] vector, int[] resultVector)
-        {
-            for (var i = 0; i < vector.Length; i++)
-            {
-                if (vector[i] != resultVector[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private void NormalizeWithThreshold(int[] vector)
-        {
-            for (var i = 0; i < vector.Length; i++)
-            {
-
-                vector[i] /= Threshold;
-            }
-        }
-
-        private void InitializeMatrix()
-        {
-            CorrelationMatrix = new int[matrixSize][];
-            for (var i = 0; i < matrixSize; i++)
-            {
-                CorrelationMatrix[i] = new int[matrixSize];
-            }
+            var resultVector = (vector * _correlationMatrix).Map(x => x>= Threshold ? 1.0f : 0.0f);
+            return resultVector.Equals(vector);
         }
     }
 }
