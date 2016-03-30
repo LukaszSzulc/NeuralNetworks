@@ -90,8 +90,6 @@
             return Matrix<float>.Build.DenseOfRowVectors(vector);
         }
 
-   
-
         private float NormalizeMatrix(float value)
         {
             return value > 0.0f ? 1.0f : 0.0f;

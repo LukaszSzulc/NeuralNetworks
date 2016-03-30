@@ -11,8 +11,7 @@
 			this.fixture = fixture;
 		}
 
-		const int Size = 5;
-		[Fact]
+	    [Fact]
 		public void MatrixTrainedWithVectorShouldContainsTwoNotZeroRows()
 		{
             fixture.TrainNeuralNetworkWithSingleVector();
@@ -27,7 +26,6 @@
 
 			Assert.Equal(NeuralNetworkTestHelper.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 }), fixture.GetFirstRowOfCorrelationMatrix());
 			Assert.Equal(NeuralNetworkTestHelper.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 1 }), fixture.GetSecondRowOfCorrelationMatrix());
-
 		}
 
 		[Fact]

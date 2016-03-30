@@ -1,13 +1,10 @@
 ﻿namespace NeuralNetworks.Tests
 {
     using Xunit;
-    using Xunit.Abstractions;
 
     public class Bam : IClassFixture<BamNeuralNetworkFixture>
     {
         private readonly BamNeuralNetworkFixture fixture;
-
-        private readonly ITestOutputHelper output;
 
         public Bam(BamNeuralNetworkFixture fixture)
         {
@@ -27,14 +24,11 @@
         {
             fixture.TrainNetwork();
 
-
             var knownName = fixture.GetName();
-
 
             Assert.Equal(NeuralNetworkTestHelper.CreateMatrixFromFloatMatrix(fixture.CreateBamNamesResult()), knownName);
         }
      
-        
         [Fact]
         public void WhenUserAskForImageItShouldReceiveCorrectValues()
         {
@@ -44,7 +38,5 @@
 
             Assert.Equal(NeuralNetworkTestHelper.CreateMatrixFromFloatMatrix(fixture.CreateBamImageResult()), knownImage);
         }
-
-
     }
 }
