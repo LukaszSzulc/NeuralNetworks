@@ -2,20 +2,18 @@
 {
     using MathNet.Numerics.LinearAlgebra;
 
-    using NeuralNetworks.Common;
-
     public class BcmModel
     {
 
         const int Threshold = 2;
 
-        private readonly Matrix<float> _correlationMatrix;
+        private readonly Matrix<float> correlationMatrix;
 
-        public Matrix<float> CorrelationMatrix => _correlationMatrix;
+        public Matrix<float> CorrelationMatrix => correlationMatrix;
          
         public BcmModel(int size)
         {
-            _correlationMatrix = Matrix<float>.Build.DenseOfArray(new float[size,size]);
+            correlationMatrix = Matrix<float>.Build.DenseOfArray(new float[size,size]);
         }
 
         public void Train(Vector<float> vector)
@@ -26,7 +24,7 @@
                 {
                     if ((int)vector[i] * (int)vector[j] == 1)
                     {
-                        _correlationMatrix[i,j] = 1;
+                        correlationMatrix[i,j] = 1;
                     }
                 }
             }
@@ -34,7 +32,7 @@
 
         public bool Test(Vector<float> vector)
         {
-            var resultVector = (vector * _correlationMatrix).Map(x => x>= Threshold ? 1.0f : 0.0f);
+            var resultVector = (vector * correlationMatrix).Map(x => x>= Threshold ? 1.0f : 0.0f);
             return resultVector.Equals(vector);
         }
     }

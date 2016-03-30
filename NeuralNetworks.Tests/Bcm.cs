@@ -1,17 +1,12 @@
 ﻿namespace NeuralNetworks.Tests
 {
-	using System;
-	using System.Data;
-
-	using MathNet.Numerics.LinearAlgebra;
-
 	using Xunit;
 
-	public class Bcm : IClassFixture<NeuralNetworkFixture>
+	public class Bcm : IClassFixture<BcmNeuralFixture>
 	{
-		private readonly NeuralNetworkFixture fixture;
+		private readonly BcmNeuralFixture fixture;
 
-		public Bcm(NeuralNetworkFixture fixture)
+		public Bcm(BcmNeuralFixture fixture)
 		{
 			this.fixture = fixture;
 		}
@@ -20,40 +15,27 @@
 		[Fact]
 		public void MatrixTrainedWithVectorShouldContainsTwoNotZeroRows()
 		{
-			var vector = fixture.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 });
-		  
-			var bcmModel = new BcmModel(Size);
+            fixture.TrainNeuralNetworkWithSingleVector();
 
-			bcmModel.Train(vector);
-
-			Assert.Equal(fixture.BuildVectorFromArray(new [] {1.0f,1,0,0,0}),bcmModel.CorrelationMatrix.Row(0));
+			Assert.Equal(NeuralNetworkTestHelper.BuildVectorFromArray(new [] {1.0f,1,0,0,0}),fixture.GetFirstRowOfCorrelationMatrix());
 		}
 
 		[Fact]
 		public void TraningMatrixWithSecondVectorShouldNotChangeFirstRow()
 		{
-			var firstVector = fixture.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 });
-			var secondVector = fixture.BuildVectorFromArray(new[] { 0.0f, 1, 0, 0, 1 });
-			var bcmModel = new BcmModel(Size);
+            fixture.TrainNeuralNetworkWithTwoVectors();
 
-			bcmModel.Train(firstVector);
-			bcmModel.Train(secondVector);
-
-			Assert.Equal(fixture.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 }), bcmModel.CorrelationMatrix.Row(0));
-			Assert.Equal(fixture.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 1 }), bcmModel.CorrelationMatrix.Row(1));
+			Assert.Equal(NeuralNetworkTestHelper.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 }), fixture.GetFirstRowOfCorrelationMatrix());
+			Assert.Equal(NeuralNetworkTestHelper.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 1 }), fixture.GetSecondRowOfCorrelationMatrix());
 
 		}
 
 		[Fact]
 		public void TrainedMatrixShouldKnowProvidedVector()
-		{
-			var firstVector = fixture.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 });
-			var secondVector = fixture.BuildVectorFromArray(new[] { 0.0f, 1, 0, 0, 1 });
-			var bcmModel = new BcmModel(Size);
-			bcmModel.Train(firstVector);
-			bcmModel.Train(secondVector);
+        { 
+            fixture.TrainNeuralNetworkWithTwoVectors();
 
-			var resultOfTest = bcmModel.Test(fixture.BuildVectorFromArray(new[] { 0.0f, 1, 0, 0, 1 }));
+		    var resultOfTest = fixture.VerifyKnownVector();
 
 			Assert.True(resultOfTest);
 		}
@@ -62,13 +44,9 @@
 		[Fact]
 		public void TrainedMatrixShouldNotKnowProvidedVector()
 		{
-			var firstVector = fixture.BuildVectorFromArray(new[] { 1.0f, 1, 0, 0, 0 });
-			var secondVector = fixture.BuildVectorFromArray(new[] { 0.0f, 1, 0, 0, 1 });
-			var bcmModel = new BcmModel(Size);
-			bcmModel.Train(firstVector);
-			bcmModel.Train(secondVector);
+			fixture.TrainNeuralNetworkWithTwoVectors();
 
-			var resultOfTest = bcmModel.Test(fixture.BuildVectorFromArray(new[] { 0.0f, 0, 0, 0, 1 }));
+		    var resultOfTest = fixture.VerifyUnknownVector();
 
 			Assert.False(resultOfTest);
 		}

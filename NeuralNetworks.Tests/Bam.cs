@@ -1,16 +1,50 @@
 ﻿namespace NeuralNetworks.Tests
 {
     using Xunit;
+    using Xunit.Abstractions;
 
-    public class Bam
+    public class Bam : IClassFixture<BamNeuralNetworkFixture>
     {
-        [Fact]
-        public void Execute()
-        {
-            var bam = new BamModel(6, 4);
-            bam.Train(new[] { 0, 1, 1, 1, 0, 1 }, new[] { 1, 1, 0, 0 });
-            bam.Train(new[] { 1, 0, 0, 1, 0, 0 }, new[] { 1, 0, 1, 0 });
+        private readonly BamNeuralNetworkFixture fixture;
 
+        private readonly ITestOutputHelper output;
+
+        public Bam(BamNeuralNetworkFixture fixture)
+        {
+            this.fixture = fixture;
         }
+
+        [Fact]
+        public void TrainingMethodShouldCreateCorrectCorrelationMatrix()
+        {
+            fixture.TrainNetwork();
+
+            Assert.Equal(NeuralNetworkTestHelper.CreateMatrixFromFloatMatrix(fixture.CreateBamCorrelationResultMatrix()), fixture.Bam.CorrectionalMatrix);
+        }
+
+        [Fact]
+        public void WhenUserAskForNameItShouldReceiveCorrectValues()
+        {
+            fixture.TrainNetwork();
+
+
+            var knownName = fixture.GetName();
+
+
+            Assert.Equal(NeuralNetworkTestHelper.CreateMatrixFromFloatMatrix(fixture.CreateBamNamesResult()), knownName);
+        }
+     
+        
+        [Fact]
+        public void WhenUserAskForImageItShouldReceiveCorrectValues()
+        {
+            fixture.TrainNetwork();
+
+            var knownImage = fixture.GetImage();
+
+            Assert.Equal(NeuralNetworkTestHelper.CreateMatrixFromFloatMatrix(fixture.CreateBamImageResult()), knownImage);
+        }
+
+
     }
 }
